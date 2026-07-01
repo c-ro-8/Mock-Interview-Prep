@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mock Interview Prep · Powered by Claude</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7f6f3;
+      --surface: #ffffff;
+      --border: #e2e0d8;
+      --text: #1a1a18;
+      --muted: #6b6b66;
+      --accent: #2563eb;
+      --accent-bg: #eff6ff;
+      --success-bg: #f0fdf4;
+      --success-border: #bbf7d0;
+      --success-text: #166534;
+      --radius: 10px;
+      --mono: 'Courier New', Courier, monospace;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-mark {
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    header h1 {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    header p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-left: auto;
+    }
+
+    main {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    .setup-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .setup-card h2 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 1rem;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 560px) {
+      .field-row { grid-template-columns: 1fr; }
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.55rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--surface);
+      transition: border-color 0.15s;
+      outline: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .api-notice {
+      background: var(--accent-bg);
+      border: 1px solid #bfdbfe;
+      border-radius: 7px;
+      padding: 0.75rem 1rem;
+      font-size: 13px;
+      color: #1e40af;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+
+    .api-notice a {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.65rem 1.25rem;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      width: 100%;
+    }
+
+    .btn-primary:hover { background: #1d4ed8; }
+    .btn-primary:active { transform: scale(0.99); }
+    .btn-primary:disabled { background: #93c5fd; cursor: not-allowed; }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.55rem 1rem;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg);
+      border-color: #c5c3bb;
+      color: var(--text);
+    }
+
+    /* Interview session UI */
+    .session { display: none; }
+    .session.active { display: block; }
+    .setup.hidden { display: none; }
+
+    .progress-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .progress-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: background 0.2s;
+    }
+
+    .dot.done { background: #86efac; }
+    .dot.active { background: var(--accent); }
+
+    .progress-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-left: auto;
+    }
+
+    .question-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .question-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 0.6rem;
+    }
+
+    .question-text {
+      font-size: 18px;
+      font-weight: 500;
+      line-height: 1.45;
+      letter-spacing: -0.01em;
+    }
+
+    .answer-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .answer-card label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+
+    .char-count {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: right;
+      margin-top: 0.4rem;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .action-row .btn-primary {
+      flex: 1;
+    }
+
+    /* Feedback panel */
+    .feedback-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .feedback-card.visible { display: block; }
+
+    .feedback-card h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 1rem;
+    }
+
+    .score-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .score-pill {
+      text-align: center;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 0.5rem;
+    }
+
+    .score-pill .score-num {
+      font-size: 22px;
+      font-weight: 700;
+      display: block;
+      line-height: 1;
+      margin-bottom: 0.25rem;
+    }
+
+    .score-pill .score-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .score-high { color: #16a34a; }
+    .score-mid  { color: #d97706; }
+    .score-low  { color: #dc2626; }
+
+    .feedback-body {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text);
+      white-space: pre-wrap;
+    }
+
+    .feedback-body.loading {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* Summary screen */
+    .summary { display: none; }
+    .summary.active { display: block; }
+
+    .summary-header {
+      background: var(--success-bg);
+      border: 1px solid var(--success-border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .summary-header h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--success-text);
+      margin-bottom: 0.25rem;
+    }
+
+    .summary-header p {
+      font-size: 14px;
+      color: var(--success-text);
+      opacity: 0.8;
+    }
+
+    .summary-scores {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .summary-score-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      text-align: center;
+    }
+
+    .summary-score-card .big-num {
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 1;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+
+    .summary-score-card .num-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .q-review {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .q-review-question {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .q-review-score {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .restart-row {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 100px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .tag-behavioral { background: #fef3c7; color: #92400e; }
+    .tag-technical  { background: #ede9fe; color: #5b21b6; }
+    .tag-situational{ background: #dcfce7; color: #166534; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">🎯</div>
+  <h1>Mock Interview Prep</h1>
+  <p>Powered by Claude</p>
+</header>
+
+<main>
+
+  <!-- SETUP -->
+  <div class="setup" id="setup">
+
+    <div class="api-notice">
+      <strong>API key required.</strong> This tool calls Claude directly from your browser.
+      Get a free key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> — paste it below. Your key is never stored or sent anywhere except Anthropic.
+    </div>
+
+    <div class="setup-card">
+      <h2>Your API key</h2>
+      <label for="apiKey">Anthropic API key</label>
+      <input type="password" id="apiKey" placeholder="sk-ant-..." autocomplete="off" />
+    </div>
+
+    <div class="setup-card">
+      <h2>Job details</h2>
+      <div class="field-row">
+        <div>
+          <label for="role">Role you're applying for</label>
+          <input type="text" id="role" placeholder="e.g. AI Fellow, Program Manager" />
+        </div>
+        <div>
+          <label for="org">Organization</label>
+          <input type="text" id="org" placeholder="e.g. Braven, Code for America" />
+        </div>
+      </div>
+      <div>
+        <label for="jobDesc">Job description or key responsibilities (optional)</label>
+        <textarea id="jobDesc" placeholder="Paste a few lines from the job posting — the more context, the more targeted the questions."></textarea>
+      </div>
+    </div>
+
+    <div class="setup-card">
+      <h2>Interview settings</h2>
+      <div class="field-row">
+        <div>
+          <label for="numQuestions">Number of questions</label>
+          <select id="numQuestions">
+            <option value="3">3 — Quick practice</option>
+            <option value="5" selected>5 — Standard session</option>
+            <option value="8">8 — Full mock interview</option>
+          </select>
+        </div>
+        <div>
+          <label for="focus">Question focus</label>
+          <select id="focus">
+            <option value="mixed">Mixed (behavioral + situational)</option>
+            <option value="behavioral">Behavioral only (STAR format)</option>
+            <option value="situational">Situational / case-based</option>
+            <option value="impact">Social impact & motivation</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="startBtn" onclick="startSession()">
+      Generate interview questions →
+    </button>
+
+  </div>
+
+  <!-- SESSION -->
+  <div class="session" id="session">
+
+    <div class="progress-bar">
+      <div class="progress-dots" id="progressDots"></div>
+      <div class="progress-label" id="progressLabel"></div>
+    </div>
+
+    <div class="question-card">
+      <div class="question-eyebrow" id="questionEyebrow">Question 1 of 5</div>
+      <div class="question-text" id="questionText">Loading your question…</div>
+    </div>
+
+    <div class="answer-card">
+      <label for="answerBox">Your answer</label>
+      <textarea id="answerBox" rows="6"
+        placeholder="Type your answer here. For behavioral questions, try: Situation → Task → Action → Result (STAR)."
+        oninput="updateCharCount()"></textarea>
+      <div class="char-count" id="charCount">0 words</div>
+    </div>
+
+    <div class="feedback-card" id="feedbackCard">
+      <h3>Claude's feedback</h3>
+      <div class="score-row" id="scoreRow" style="display:none"></div>
+      <div class="feedback-body" id="feedbackBody"></div>
+    </div>
+
+    <div class="action-row">
+      <button class="btn-secondary" id="skipBtn" onclick="skipQuestion()">Skip</button>
+      <button class="btn-primary" id="submitBtn" onclick="submitAnswer()">
+        Get feedback →
+      </button>
+    </div>
+
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary" id="summary">
+    <div class="summary-header">
+      <h2 id="summaryTitle">Session complete</h2>
+      <p id="summarySubtitle"></p>
+    </div>
+
+    <div class="summary-scores" id="summaryScores"></div>
+
+    <div id="qReviewList"></div>
+
+    <div class="restart-row">
+      <button class="btn-secondary" style="flex:1" onclick="restartSameSettings()">Practice again →</button>
+      <button class="btn-primary" style="flex:1" onclick="restartFresh()">New session →</button>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  let apiKey = '';
+  let questions = [];
+  let currentQ = 0;
+  let results = [];
+  let settings = {};
+
+  function updateCharCount() {
+    const words = document.getElementById('answerBox').value.trim().split(/\s+/).filter(Boolean).length;
+    document.getElementById('charCount').textContent = `${words} word${words !== 1 ? 's' : ''}`;
+  }
+
+  async function startSession() {
+    const key = document.getElementById('apiKey').value.trim();
+    const role = document.getElementById('role').value.trim();
+    const org = document.getElementById('org').value.trim();
+    const jobDesc = document.getElementById('jobDesc').value.trim();
+    const num = parseInt(document.getElementById('numQuestions').value);
+    const focus = document.getElementById('focus').value;
+
+    if (!key) { alert('Please enter your Anthropic API key.'); return; }
+    if (!role) { alert('Please enter the role you\'re applying for.'); return; }
+
+    apiKey = key;
+    settings = { role, org, jobDesc, num, focus };
+
+    const btn = document.getElementById('startBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Generating questions…';
+
+    const focusMap = {
+      mixed: 'a mix of behavioral (STAR format) and situational questions',
+      behavioral: 'behavioral questions only, each requiring a STAR-format answer',
+      situational: 'situational and case-based questions',
+      impact: 'questions about social impact motivation, mission alignment, and past community work'
+    };
+
+    const prompt = `You are a senior interviewer at ${org || 'a nonprofit organization'} hiring for a "${role}" role.
+${jobDesc ? `\nKey job responsibilities:\n${jobDesc}\n` : ''}
+Generate exactly ${num} interview questions. Focus on: ${focusMap[focus]}.
+
+Return ONLY a JSON array in this exact format, no other text:
+[
+  {"type": "behavioral", "question": "Tell me about a time you..."},
+  {"type": "situational", "question": "Imagine you are..."}
+]
+
+Types must be one of: behavioral, situational, technical, motivational.
+Make questions specific to the role and org context. Do not number them.`;
+
+    try {
+      const res = await callClaude(prompt, 800);
+      const clean = res.replace(/```json|```/g, '').trim();
+      questions = JSON.parse(clean);
+      results = new Array(questions.length).fill(null);
+      currentQ = 0;
+
+      document.getElementById('setup').classList.add('hidden');
+      document.getElementById('session').classList.add('active');
+      renderQuestion();
+    } catch (err) {
+      alert('Could not generate questions. Check your API key and try again.\n\n' + err.message);
+      btn.disabled = false;
+      btn.textContent = 'Generate interview questions →';
+    }
+  }
+
+  function renderQuestion() {
+    const q = questions[currentQ];
+    const total = questions.length;
+
+    document.getElementById('questionEyebrow').innerHTML =
+      `Question ${currentQ + 1} of ${total} &nbsp;<span class="tag tag-${q.type}">${q.type}</span>`;
+    document.getElementById('questionText').textContent = q.question;
+    document.getElementById('progressLabel').textContent = `${currentQ + 1} / ${total}`;
+    document.getElementById('answerBox').value = '';
+    document.getElementById('charCount').textContent = '0 words';
+
+    const fc = document.getElementById('feedbackCard');
+    fc.classList.remove('visible');
+    document.getElementById('feedbackBody').textContent = '';
+    document.getElementById('scoreRow').style.display = 'none';
+
+    document.getElementById('submitBtn').disabled = false;
+    document.getElementById('submitBtn').textContent = 'Get feedback →';
+    document.getElementById('skipBtn').textContent = 'Skip';
+
+    buildProgressDots();
+  }
+
+  function buildProgressDots() {
+    const dots = document.getElementById('progressDots');
+    dots.innerHTML = '';
+    questions.forEach((_, i) => {
+      const d = document.createElement('div');
+      d.className = 'dot' + (i < currentQ ? ' done' : i === currentQ ? ' active' : '');
+      dots.appendChild(d);
+    });
+  }
+
+  async function submitAnswer() {
+    const answer = document.getElementById('answerBox').value.trim();
+    if (!answer) { alert('Write an answer first — even a rough one is better than nothing.'); return; }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Getting feedback…';
+
+    const q = questions[currentQ];
+    const fc = document.getElementById('feedbackCard');
+    const fb = document.getElementById('feedbackBody');
+
+    fc.classList.add('visible');
+    fb.className = 'feedback-body loading';
+    fb.textContent = 'Analyzing your answer…';
+
+    const prompt = `You are an expert interview coach helping someone prepare for a "${settings.role}" role at "${settings.org || 'a nonprofit'}".
+
+Interview question:
+"${q.question}"
+
+Candidate's answer:
+"${answer}"
+
+Provide feedback in this exact JSON format:
+{
+  "clarity": 7,
+  "relevance": 8,
+  "specificity": 6,
+  "feedback": "2-3 sentences of honest, direct feedback. What worked, what was missing, one concrete thing to improve."
+}
+
+Scores are 1-10. feedback must be under 80 words, conversational, and constructive. Return only the JSON.`;
+
+    try {
+      const res = await callClaude(prompt, 400);
+      const clean = res.replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(clean);
+
+      results[currentQ] = { question: q.question, type: q.type, scores: parsed, answer };
+
+      renderScores(parsed);
+      fb.className = 'feedback-body';
+      fb.textContent = parsed.feedback;
+
+      btn.textContent = currentQ < questions.length - 1 ? 'Next question →' : 'See results →';
+      btn.disabled = false;
+      btn.onclick = nextQuestion;
+      document.getElementById('skipBtn').style.display = 'none';
+
+    } catch (err) {
+      fb.className = 'feedback-body';
+      fb.textContent = 'Could not load feedback. Check your API key and try again.';
+      btn.disabled = false;
+      btn.textContent = 'Get feedback →';
+    }
+  }
+
+  function renderScores(parsed) {
+    const row = document.getElementById('scoreRow');
+    const dims = [
+      { key: 'clarity', label: 'Clarity' },
+      { key: 'relevance', label: 'Relevance' },
+      { key: 'specificity', label: 'Specificity' }
+    ];
+    row.innerHTML = dims.map(d => {
+      const n = parsed[d.key];
+      const cls = n >= 8 ? 'score-high' : n >= 6 ? 'score-mid' : 'score-low';
+      return `<div class="score-pill">
+        <span class="score-num ${cls}">${n}</span>
+        <span class="score-label">${d.label}</span>
+      </div>`;
+    }).join('');
+    row.style.display = 'grid';
+  }
+
+  function nextQuestion() {
+    currentQ++;
+    if (currentQ >= questions.length) {
+      showSummary();
+    } else {
+      document.getElementById('submitBtn').onclick = submitAnswer;
+      document.getElementById('skipBtn').style.display = '';
+      renderQuestion();
+    }
+  }
+
+  function skipQuestion() {
+    results[currentQ] = null;
+    currentQ++;
+    if (currentQ >= questions.length) {
+      showSummary();
+    } else {
+      renderQuestion();
+    }
+  }
+
+  function showSummary() {
+    document.getElementById('session').classList.remove('active');
+    document.getElementById('summary').classList.add('active');
+
+    const answered = results.filter(Boolean);
+    const avgClarity = avg(answered.map(r => r.scores.clarity));
+    const avgRelevance = avg(answered.map(r => r.scores.relevance));
+    const avgSpec = avg(answered.map(r => r.scores.specificity));
+    const overall = avg([avgClarity, avgRelevance, avgSpec]);
+
+    document.getElementById('summaryTitle').textContent =
+      overall >= 8 ? '🎉 Strong session' : overall >= 6 ? '👍 Good effort' : '💪 Keep practicing';
+    document.getElementById('summarySubtitle').textContent =
+      `${answered.length} of ${questions.length} questions answered · Overall score ${overall.toFixed(1)} / 10`;
+
+    document.getElementById('summaryScores').innerHTML = [
+      { label: 'Clarity', val: avgClarity },
+      { label: 'Relevance', val: avgRelevance },
+      { label: 'Specificity', val: avgSpec }
+    ].map(s => {
+      const cls = s.val >= 8 ? 'score-high' : s.val >= 6 ? 'score-mid' : 'score-low';
+      return `<div class="summary-score-card">
+        <span class="big-num ${cls}">${s.val.toFixed(1)}</span>
+        <span class="num-label">${s.label}</span>
+      </div>`;
+    }).join('');
+
+    document.getElementById('qReviewList').innerHTML = results.map((r, i) => {
+      if (!r) return `<div class="q-review"><div class="q-review-question" style="color:var(--muted)">Q${i+1}: ${questions[i].question}</div><div class="q-review-score">Skipped</div></div>`;
+      const avg3 = avg([r.scores.clarity, r.scores.relevance, r.scores.specificity]);
+      const cls = avg3 >= 8 ? 'score-high' : avg3 >= 6 ? 'score-mid' : 'score-low';
+      return `<div class="q-review">
+        <div class="q-review-question">Q${i+1}: ${r.question}</div>
+        <div class="q-review-score ${cls}">Score: ${avg3.toFixed(1)} / 10 &nbsp;·&nbsp; ${r.scores.feedback}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function avg(arr) {
+    if (!arr.length) return 0;
+    return arr.reduce((a, b) => a + b, 0) / arr.length;
+  }
+
+  function restartSameSettings() {
+    questions = [];
+    results = [];
+    currentQ = 0;
+    document.getElementById('summary').classList.remove('active');
+    document.getElementById('setup').classList.remove('hidden');
+    document.getElementById('submitBtn').onclick = submitAnswer;
+    document.getElementById('skipBtn').style.display = '';
+    startSession();
+  }
+
+  function restartFresh() {
+    questions = [];
+    results = [];
+    currentQ = 0;
+    document.getElementById('summary').classList.remove('active');
+    document.getElementById('setup').classList.remove('hidden');
+    document.getElementById('startBtn').disabled = false;
+    document.getElementById('startBtn').textContent = 'Generate interview questions →';
+  }
+
+  async function callClaude(userMessage, maxTokens = 1000) {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: maxTokens,
+        messages: [{ role: 'user', content: userMessage }]
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error?.message || `API error ${res.status}`);
+    }
+    const data = await res.json();
+    return data.content.map(b => b.text || '').join('');
+  }
+</script>
+</body>
+</html>
